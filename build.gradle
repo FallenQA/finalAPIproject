@@ -53,9 +53,3 @@ tasks.withType(Test) {
         }
     }
 }
-
-task hw19_test(type: Test) {
-    useJUnitPlatform {
-        includeTags("finalWorkApi")
-    }
-}

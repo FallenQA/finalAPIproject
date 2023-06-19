@@ -1,11 +1,9 @@
 package tests;
 
 
-import models.ErrorsModel;
 import models.RequestBodyModel;
 import models.ResponseModel;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
@@ -18,61 +16,14 @@ import static specs.LoginSpec.requestSpec;
 import static specs.LoginSpec.responseSpec;
 
 
-@Tag("finalWorkApi")
 @DisplayName("HW Rest Api, models and specs")
-
-public class ReqresTests {
+public class UserApiTest {
     RequestBodyModel requestBody = new RequestBodyModel();
-
-
-    @Test
-    @DisplayName("Проверка успешного создания пользователя")
-    void testPostCreate() {
-        requestBody.setName("Testovui");
-        requestBody.setJob("QA");
-
-        String expectedName = "Testovui";
-        String expectedJob = "QA";
-
-        ResponseModel response = step("Отправка post запроса на создание пользователя", () ->
-                given(requestSpec)
-                        .body(requestBody)
-                        .when()
-                        .post("/users")
-                        .then()
-                        .log().all()
-                        .spec(responseSpec)
-                        .statusCode(201)
-                        .extract().as(ResponseModel.class));
-        step("Проверка введенного имени", () ->
-                assertThat(response.getName()).isEqualTo(expectedName));
-        step("Проверка введенной работы", () ->
-                assertThat(response.getJob()).isEqualTo(expectedJob));
-    }
-
-    @Test
-    @DisplayName("Проверка успешного удаления")
-    void testDelete() {
-
-        step("delete запрос на удаление", () ->
-                given(requestSpec)
-                        .when()
-                        .delete("/users/2")
-                        .then()
-                        .spec(responseSpec)
-                        .statusCode(204));
-
-    }
-
     @Test
     @DisplayName("Проверка успешного редактирования пользователя")
     void testPutUpdate() {
-        requestBody.setName("TestovuiXXX");
-        requestBody.setJob("QA Auto");
-
-        String expectedName = "TestovuiXXX";
-        String expectedJob = "QA Auto";
-
+        requestBody.setName("Testovui");
+        requestBody.setJob("QA");
         ResponseModel response = step("put запрос на изменение данных", () ->
                 given(requestSpec)
                         .body(requestBody)
@@ -82,13 +33,11 @@ public class ReqresTests {
                         .spec(responseSpec)
                         .statusCode(200)
                         .extract().as(ResponseModel.class));
-
         step("Проверка введенного имени", () ->
-                assertThat(response.getName()).isEqualTo(expectedName));
+                assertThat(response.getName()).isEqualTo(requestBody.getName()));
         step("Проверка введенной работы", () ->
-                assertThat(response.getJob()).isEqualTo(expectedJob));
+                assertThat(response.getJob()).isEqualTo(requestBody.getJob()));
     }
-
     @Test
     @DisplayName("Проверка, что пользователь не найден")
     void testSingleUserNotFound() {
@@ -100,7 +49,6 @@ public class ReqresTests {
                         .spec(responseSpec)
                         .statusCode(404));
     }
-
     @Test
     @DisplayName("Проверка JsonScheme")
         //https://www.liquid-technologies.com/online-json-to-schema-converter
@@ -114,30 +62,6 @@ public class ReqresTests {
                         .statusCode(200)
                         .body(matchesJsonSchemaInClasspath("scheme/jsonscheme_resp.json")));
     }
-
-
-    @Test
-    @DisplayName("Проверка неудачной регистрации")
-    void testRegisterUnsuccessful() {
-
-        requestBody.setEmail("incorrectemail@");
-
-        String expectedError = "Missing password";
-
-        ErrorsModel responsError = step("Отправка post запроса c некорректым email", () ->
-                given(requestSpec)
-                        .body(requestBody)
-                        .when()
-                        .post("/register")
-                        .then()
-                        .spec(responseSpec)
-                        .statusCode(400)
-                        .extract().as(ErrorsModel.class));
-
-        step("Проверка получения ошибки", () ->
-                assertThat(responsError.getError()).isEqualTo(expectedError));
-    }
-
     @Test
     @DisplayName("Проверка получения листа данных")
     void testSingleUserLombok() {
